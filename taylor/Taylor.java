@@ -4,6 +4,7 @@ import java.math.BigDecimal;
 
 public class Taylor {
 
+  //Definición de la función factorial
   public static double factorial (double num) {
     double factorial = 1;
     for (double i = num; i > 1; i--) {
@@ -11,7 +12,7 @@ public class Taylor {
     }
     return factorial;
   }
-
+  //Asignación factorial al arreglo
   public static double[] nFactorial (double num) {
     double factoriales[] = new double[(int)num];
     for (double i = num; i >= 0; i--) {
@@ -19,7 +20,7 @@ public class Taylor {
     }
     return factoriales;
   }
-
+  //Función para obtener los coeficientes mediante la derivada
   public static double[] coefSen (int num, double c) {
     double coeficientes[] = new double[num];
     for (int i = 0; i < num; i++) {
@@ -36,7 +37,7 @@ public class Taylor {
     }
     return coeficientes;
   }
-
+  //Definición de la función de Horner
   public static double horner (double polinomio[], double x, double c) {
     int grado = polinomio.length - 1;
     double suma = polinomio[grado];
@@ -44,22 +45,22 @@ public class Taylor {
       suma = ((x - c) * suma) + polinomio[i];
     return suma;
   }
-
+  //Implementación del método falsa posición
   public static double falsaPosicion (double polinomio[], double c, double tolerancia) {
     double f0, ff, fr, error;
     double x0 = 3, xf = 3.5, xr = 0, xra;
-    do {
+    do {                                                //While para manejar la tolerancia mediante el error relativo
       xra = xr;
-      f0 = horner(polinomio, x0, c);
-      ff = horner(polinomio, xf, c);
-      xr = xf - ((ff * (x0 - xf)) / (f0 - ff));
-      fr = horner(polinomio, xr, c);
-      error = Math.abs( ( (xr - xra) / xr ) * 100 );
-      if (fr * f0 < 0)
+      f0 = horner(polinomio, x0, c);                    //Se evalua f(x) en x0 con la función de Horner
+      ff = horner(polinomio, xf, c);                    //Se evalua f(x) en xf con la función de Horner
+      xr = xf - ((ff * (x0 - xf)) / (f0 - ff));         //Se aplica la fórmula del método de falsa posición
+      fr = horner(polinomio, xr, c);                    //Se evalua f(x) en xr con la función de Horner
+      error = Math.abs( ( (xr - xra) / xr ) * 100 );    //Cálculo del error relativo
+      if (fr * f0 < 0)                                  //Condición para el método de falsa posición
         xf = xr;
       else if (fr * f0 > 0)
         x0 = xr;
-    } while(error >= tolerancia);
+    } while(error >= tolerancia);                       
     return xr;
   }
 
@@ -74,19 +75,20 @@ public class Taylor {
 
     System.out.print("Cifras significativas: ");
     int cifras = scan.nextInt();
-    double tolerancia = 0.5 * Math.pow(10, (2-cifras));
+    double tolerancia = 0.5 * Math.pow(10, (2-cifras));    //Cálculo de la tolerancia
 
     double error, piaprox;
     double[] polinomio;
-    do {
-      polinomio = coefSen(sumandos, c);
-      piaprox = falsaPosicion(polinomio, c, tolerancia);
-      error = Math.abs(((Math.PI - piaprox) / Math.PI) * 100);
+    do {                                                    //do-while para manejar la toleriancia mediante el valor real de pi
+                                                            //Si no se cumple, se irán agregando sumandos al polinomio 
+      polinomio = coefSen(sumandos, c);                           //Cargar el polinomio con sus coeficientes
+      piaprox = falsaPosicion(polinomio, c, tolerancia);          //Cálculo de pi mediante el método de falsa posición
+      error = Math.abs(((Math.PI - piaprox) / Math.PI) * 100);    //Cálculo del error real de pi
       System.out.println("Sumandos");
       for (int i = 0; i < polinomio.length; i ++)
-        System.out.println("\t" + polinomio[i] + "\tx^" + i);
+      System.out.println("\t" + polinomio[i] + "\tx^" + i);
       System.out.println("Error para " + polinomio.length + " sumandos: " + error + "\n");
-      sumandos ++;
+      sumandos ++;                                                //Se agrega un sumando al polinomio 
     } while (error >= tolerancia);
     System.out.print("\t\t\t1 ");
     for (int i = 2; i <= 9; i ++) System.out.print(i);
